@@ -1,0 +1,22 @@
+require 'open-uri'
+require 'json'
+require 'base64'
+require './operating_system'
+
+username = 'view'
+password = 'password'
+go_base_url = "https://build.gocd.io/go"
+
+installer_dependency_locator = (ENV['GO_DEPENDENCY_LOCATOR_INSTALLERS'] or raise "GO_DEPENDENCY_LOCATOR_INSTALLERS is not set!")
+installer_job_identifier = "#{installer_dependency_locator}/dist"
+binaries_url = "#{go_base_url}/files/#{installer_job_identifier}/dist.json"
+
+# version_data = JSON.parse(open("#{go_base_url}/files/#{installer_job_identifier}/dist/meta/version.json", 'r', {http_basic_authentication: [username, password]}).read)
+#
+# go_full_version = version_data['go_full_version']
+
+task :default do
+  Oses = [Mac.new(binaries_url)].each do |os|
+    os.sign
+  end
+end
